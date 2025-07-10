@@ -1,0 +1,18 @@
+# up.yaml
+- name: Deploy MySQL and apply schema using Flyway
+  hosts: localhost
+  tasks:
+    - name: Ensure MySQL is running (Docker)
+      shell: docker start mysql || docker run --name mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 -d mysql:8
+      ignore_errors: yes
+
+    - name: Wait for MySQL to be ready
+      wait_for:
+        port: 3306
+        delay: 10
+
+    - name: Run Flyway migrations
+      shell: >
+        flyway -url=jdbc:mysql://localhost:3306/testdb
+        -user=root -password=root
+        -locations=filesystem:flyway/sql migrate

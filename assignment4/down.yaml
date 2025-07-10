@@ -1,0 +1,12 @@
+# down.yaml
+- name: Save DB state and stop MySQL
+  hosts: localhost
+  tasks:
+    - name: Export data with mysqldump
+      shell: docker exec mysql sh -c 'exec mysqldump -uroot -proot testdb' > backup.sql
+
+    - name: Stop MySQL container
+      shell: docker stop mysql
+
+    - name: Remove MySQL container
+      shell: docker rm mysql
